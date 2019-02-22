@@ -148,14 +148,30 @@ classdef CameraCalibrationBase < handle & matlab.mixin.Heterogeneous
             [~, inliersMaskF] = estimateFundamentalMatrix(patternPoints, photoPoints, 'Method', 'RANSAC', ...
                                                 'DistanceThreshold', obj.maxInlierError);
             
-            estimator = vision.GeometricTransformEstimator;
-            estimator.Transform = 'projective';
-            estimator.AlgebraicDistanceThreshold = obj.maxInlierError;
-            [~, inliersMaskH] = estimator.step(patternPoints, photoPoints);  
+            % PC: removed from R2016
+            % estimator = vision.GeometricTransformEstimator;
+            % estimator.Transform = 'projective';
+            % estimator.AlgebraicDistanceThreshold = obj.maxInlierError;
+            % [~, inliersMaskH] = estimator.step(patternPoints, photoPoints);  
             
-            if (sum(inliersMaskH) > sum(inliersMaskF) * 0.8)
-                patternPoints = patternPoints(inliersMaskH, :);
-                photoPoints = photoPoints(inliersMaskH, :);
+%             [~, inliersMaskH, ~] = estimateGeometricTransform(patternPoints, photoPoints, 'projective');
+            [~, inliersPts1, inliersPts2] = estimateGeometricTransform(patternPoints, ...
+                photoPoints, 'projective', 'MaxDistance', obj.maxInlierError);
+            
+            
+%             if (sum(inliersMaskH) > sum(inliersMaskF) * 0.8)
+%                 patternPoints = patternPoints(inliersMaskH, :);
+%                 photoPoints = photoPoints(inliersMaskH, :);
+%                 display(['....Matches after Homog. Check: ', num2str(sum(inliersMaskF))]);
+%             else
+%                 patternPoints = patternPoints(inliersMaskF, :);
+%                 photoPoints = photoPoints(inliersMaskF, :);
+%                 display(['....Matches after Fundam. Check: ', num2str(sum(inliersMaskF))]);
+%             end
+
+            if (size(inliersPts1,1) > sum(inliersMaskF) * 0.8)
+                patternPoints = inliersPts1;
+                photoPoints = inliersPts2;
                 display(['....Matches after Homog. Check: ', num2str(sum(inliersMaskF))]);
             else
                 patternPoints = patternPoints(inliersMaskF, :);
@@ -171,23 +187,35 @@ classdef CameraCalibrationBase < handle & matlab.mixin.Heterogeneous
             end
             
             
-            % Further homography check
-            estimator = vision.GeometricTransformEstimator;
-            estimator.Transform = 'projective';
-            estimator.AlgebraicDistanceThreshold = obj.maxSmoothError;
-            [~, inliersMask] = estimator.step(patternPoints, photoPoints); 
-            
-            display(['....Matches after smoothness Check: ', num2str(sum(inliersMask))]);
-            if (sum(inliersMask) < obj.minMatchedPoints)
-                obj.photosInfo(end).valid = false; 
-                valid = false; 
-                display('....Invalid photo due to too few inliers by coarse Homography check. '); 
-                return; 
+%             % Further homography check
+%             estimator = vision.GeometricTransformEstimator;
+%             estimator.Transform = 'projective';
+%             estimator.AlgebraicDistanceThreshold = obj.maxSmoothError;
+%             [~, inliersMask] = estimator.step(patternPoints, photoPoints);
+
+            [~, inliersPts1, inliersPts2] = estimateGeometricTransform(patternPoints, photoPoints, 'projective');
+                     
+%             display(['....Matches after smoothness Check: ', num2str(sum(inliersMask))]);
+%             if (sum(inliersMask) < obj.minMatchedPoints)
+%                 obj.photosInfo(end).valid = false; 
+%                 valid = false; 
+%                 display('....Invalid photo due to too few inliers by coarse Homography check. '); 
+%                 return; 
+%             end
+           
+            display(['....Matches after smoothness Check: ', num2str(size(inliersPts1, 1))]);
+            if ((size(inliersPts1, 1)) < obj.minMatchedPoints)
+                obj.photosInfo(end).valid = false;
+                valid = false;
+                display('....Invalid photo due to too few inliers by coarse Homography check. ');
+                return;
             end
             
-            
-            patternPoints = patternPoints(inliersMask, :);
-            photoPoints = photoPoints(inliersMask, :);
+%             patternPoints = patternPoints(inliersMask, :);
+%             photoPoints = photoPoints(inliersMask, :);
+
+            patternPoints = inliersPts1;
+            photoPoints = inliersPts2;
             
             obj.photosInfo(end).valid = true; 
             obj.photosInfo(end).patternPoints = patternPoints; 
@@ -502,7 +530,3 @@ classdef CameraCalibrationBase < handle & matlab.mixin.Heterogeneous
         
     end
 end
-
-        
-        
-        
