@@ -167,7 +167,7 @@ classdef CameraCalibrationBase < handle & matlab.mixin.Heterogeneous
             [~, inliersPts1, inliersPts2] = ...
                 estimateGeometricTransform(patternPoints, ...
                 photoPoints, 'projective', 'MaxDistance', obj.maxInlierError, ...
-                'MaxNumTrials', '5000');
+                'MaxNumTrials', 16000);
                        
             if (size(inliersPts1,1) > sum(inliersMaskF) * 0.8)
                 patternPoints = inliersPts1;
@@ -195,7 +195,7 @@ classdef CameraCalibrationBase < handle & matlab.mixin.Heterogeneous
 
             [~, inliersPts1, inliersPts2] = ...
                 estimateGeometricTransform(patternPoints, photoPoints, 'projective', ...
-                'MaxDistance', obj.maxInlierError, 'MaxNumTrials', '5000');
+                'MaxDistance', obj.maxSmoothError, 'MaxNumTrials', 8000);
                      
 %             display(['....Matches after smoothness Check: ', num2str(sum(inliersMask))]);
 %             if (sum(inliersMask) < obj.minMatchedPoints)
