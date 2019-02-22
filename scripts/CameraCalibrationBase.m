@@ -154,11 +154,6 @@ classdef CameraCalibrationBase < handle & matlab.mixin.Heterogeneous
             % estimator.AlgebraicDistanceThreshold = obj.maxInlierError;
             % [~, inliersMaskH] = estimator.step(patternPoints, photoPoints);  
             
-%             [~, inliersMaskH, ~] = estimateGeometricTransform(patternPoints, photoPoints, 'projective');
-            [~, inliersPts1, inliersPts2] = estimateGeometricTransform(patternPoints, ...
-                photoPoints, 'projective', 'MaxDistance', obj.maxInlierError);
-            
-            
 %             if (sum(inliersMaskH) > sum(inliersMaskF) * 0.8)
 %                 patternPoints = patternPoints(inliersMaskH, :);
 %                 photoPoints = photoPoints(inliersMaskH, :);
@@ -169,6 +164,11 @@ classdef CameraCalibrationBase < handle & matlab.mixin.Heterogeneous
 %                 display(['....Matches after Fundam. Check: ', num2str(sum(inliersMaskF))]);
 %             end
 
+            [~, inliersPts1, inliersPts2] = ...
+                estimateGeometricTransform(patternPoints, ...
+                photoPoints, 'projective', 'MaxDistance', obj.maxInlierError, ...
+                'MaxNumTrials', '5000');
+                       
             if (size(inliersPts1,1) > sum(inliersMaskF) * 0.8)
                 patternPoints = inliersPts1;
                 photoPoints = inliersPts2;
@@ -193,7 +193,9 @@ classdef CameraCalibrationBase < handle & matlab.mixin.Heterogeneous
 %             estimator.AlgebraicDistanceThreshold = obj.maxSmoothError;
 %             [~, inliersMask] = estimator.step(patternPoints, photoPoints);
 
-            [~, inliersPts1, inliersPts2] = estimateGeometricTransform(patternPoints, photoPoints, 'projective');
+            [~, inliersPts1, inliersPts2] = ...
+                estimateGeometricTransform(patternPoints, photoPoints, 'projective', ...
+                'MaxDistance', obj.maxInlierError, 'MaxNumTrials', '5000');
                      
 %             display(['....Matches after smoothness Check: ', num2str(sum(inliersMask))]);
 %             if (sum(inliersMask) < obj.minMatchedPoints)
