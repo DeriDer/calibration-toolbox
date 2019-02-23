@@ -1,8 +1,11 @@
+%% Initialization
+
 display('----------------------------------------------------------------------'); 
 display('Multiple-Camera Calibration Toolbox'); 
 clear all
 addpath('utils/'); 
 
+%% User interaction
 
 display('----------------------------------------------------------------------'); 
 display('### Load Pattern')
@@ -66,6 +69,7 @@ if (nCameras > 1)
     end
 end
 
+%% Loading data
 
 display('----------------------------------------------------------------------'); 
 display('### Load Images'); 
@@ -96,6 +100,8 @@ if ~isempty(izeros)
     error(['No image loaded for Camera #', num2str(izeros(1)), '! ']); 
 end
 
+%% Assign data to object
+
 display('----------------------------------------------------------------------'); 
 display('### Process Images'); 
 % Initialize mono camera calibration models first
@@ -108,18 +114,21 @@ for i = 1:numel(photos)
 end
 clear photos; 
 
+%% Calibration
+
 display('----------------------------------------------------------------------'); 
 display('### Process Calibration'); 
 obj.calibrate(); 
 display('### Calibration finished'); 
 
-
+%% Output
 display('----------------------------------------------------------------------'); 
 display('### Intrinsics: '); 
 obj.outputIntrinsics(); 
 display('### Extrinsics: '); 
 obj.outputExtrinsics(); 
 
+%% Visualization
 input('Press ENTER to visualize camera poses plot and pose graph'); 
 obj.visualizeObjects(); 
 obj.visualizeGraph(); 
