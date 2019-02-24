@@ -45,10 +45,15 @@ CAMERA_TYPE={'PinholeCamera', 'CataCamera'};
 cameraType = cell(nCameras, 1); 
 
 opt = [];
-while isempty(opt) || (opt ~= 1 && opt ~= 2)
-    opt = input('Use pinhole (1) or catadioptric (2) model for Camera #1 (1/2)? '); 
+% while isempty(opt) || (opt ~= 1 && opt ~= 2)
+    opt = input('Use pinhole (1) or catadioptric (2) model for Camera #1 (1/2, []=2)? '); 
+% end
+
+if (~isempty(opt))
+    cameraType{1} = CAMERA_TYPE{opt}; 
+else
+    cameraType{1} = CAMERA_TYPE{2}; % default to catadioptric
 end
-cameraType{1} = CAMERA_TYPE{opt}; 
 
 if (nCameras > 1)
     while ~strcmpi(opt, 'Y') && ~strcmpi(opt, 'N') && ~isempty(opt)
@@ -86,9 +91,9 @@ for i = 1:numel(files)
     im = imread([path, files{i}]);
     index = sscanf(files{i}, '%d-%d');
     
-    photos(end + 1).image = im;
-    photos(end).camera = index(1);
-    photos(end).timeStamp = num2str(index(2));
+    photos(end + 1).image = im;                 % push image data
+    photos(end).camera = index(1);              % push camera idx
+    photos(end).timeStamp = num2str(index(2));  % push image timestamp
     
     width(index(1)) = size(photos(end).image, 2); 
     height(index(1)) = size(photos(end).image, 1); 

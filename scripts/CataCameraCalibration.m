@@ -16,9 +16,13 @@
 %--------------------------------------------------------------------------
 classdef CataCameraCalibration < CameraCalibrationBase
     methods
-        % 
-        function obj = CataCameraCalibration(width, height, pattern)            
+        % Initialization
+        function obj = CataCameraCalibration(width, height, pattern) 
+            % Init using base class, feature extraction from pattern
+            % included.
             obj = obj@CameraCalibrationBase(width, height, pattern); 
+            
+            % Init camera image dimensions only
             obj.camera = CataCamera(width, height); 
         end
     end
