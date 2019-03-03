@@ -115,6 +115,7 @@ for i = 1:nCameras
 end
 
 for i = 1:numel(photos)
+    % Add photo and obtain matches to pattern
     obj.addPhoto(photos(i).camera, photos(i).image, num2str(photos(i).timeStamp)); 
 end
 clear photos; 

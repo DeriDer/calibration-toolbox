@@ -117,8 +117,9 @@ classdef CameraSystemCalibration < handle
             obj.edgeList(end + 1) = struct('cameraVertex', cameraIndex, 'photoVertex', photoVertex, 'photoIndex', photoIndex, 'transform', []);
         end
         
-        %
+        % Entry for calibration process
         function obj = calibrate(obj)
+            
             obj.initializeVertices();
             %             obj.visualizeObjects();
             %             obj.outputExtrinsics();
@@ -130,9 +131,9 @@ classdef CameraSystemCalibration < handle
             end
         end
         
-        %
+        % ?
         function obj = initializeVertices(obj)
-            
+            % Calibrate each camera?
             for ci = 1:obj.nCameras
                 display(['Initialize Camera #', num2str(ci), '...']);
                 if obj.isCameraCalibrated(ci)
@@ -151,11 +152,21 @@ classdef CameraSystemCalibration < handle
                     continue;
                 end
                 
+                % Get rotation vectors
                 rvec = obj.cameraCalibrations(cameraIndex).photosInfo(photoIndex).rvec;
+                
+                % Get transfer vectors
                 tvec = obj.cameraCalibrations(cameraIndex).photosInfo(photoIndex).tvec;
+                
+                % Get rotation matrix
                 R = rodrigues(rvec);
+                
+                % Get transfer matrix
                 t = tvec;
+                
+                % Combine into transform matrix
                 obj.edgeList(i).transform = [R, t; 0, 0, 0, 1];
+                
                 kept(end + 1) = i;
             end
             obj.edgeList = obj.edgeList(kept);
